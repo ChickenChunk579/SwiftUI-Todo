@@ -8,12 +8,17 @@
 import SwiftUI
 
 struct ListRowView: View {
+    @EnvironmentObject var listViewModel: ListViewModel
     @State var item: ItemModel
     
     var body: some View {
         HStack {
             Button(action: {
-                item.completed = !item.completed
+                listViewModel.updateItem(item: item)
+                if let index = listViewModel.items.firstIndex(where: { $0.id == item.id }) {
+                    let arrayItem = listViewModel.items[index]
+                    item = ItemModel(id: arrayItem.id, title: arrayItem.title, completed: arrayItem.completed)
+                }
             }, label: {
                 Image(systemName: item.completed ? "checkmark.circle" : "circle")
                     .foregroundColor(item.completed ? .green : .red)
@@ -32,6 +37,7 @@ struct ListRowView: View {
     struct PreviewWrapper: View {
         var item1 = ItemModel(title: "First Item", completed: false)
         var item2 = ItemModel(title: "Second Item", completed: true)
+        @State var updater: Bool = false
         
         var body: some View {
             VStack {
